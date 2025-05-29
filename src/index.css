@@ -6,7 +6,7 @@
   * {
     box-sizing: border-box;
   }
-  
+
   body {
     margin: 0;
     padding: 0;
@@ -15,7 +15,7 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
@@ -25,35 +25,35 @@
   .game-board {
     @apply grid grid-cols-10 gap-1 p-4 bg-white rounded-2xl shadow-card border-2 border-purple-100;
   }
-  
+
   .board-square {
     @apply relative aspect-square flex items-center justify-center text-xs font-semibold rounded-lg transition-all duration-300;
   }
-  
+
   .dice-container {
     @apply w-16 h-16 bg-white rounded-xl shadow-neu-light border-2 border-purple-100 flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95;
   }
-  
+
   .player-piece {
     @apply absolute w-6 h-6 rounded-full border-2 border-white shadow-lg transition-all duration-500 z-10;
   }
-  
-.snake-path {
+
+  .snake-path {
     @apply absolute inset-0 bg-gradient-to-br from-red-400 via-red-500 to-red-600 rounded-lg opacity-30;
   }
-  
+
   .ladder-path {
     @apply absolute inset-0 bg-gradient-to-br from-green-400 via-green-500 to-green-600 rounded-lg opacity-30;
   }
-  
+
   .snake-visual {
-    @apply absolute inset-0 flex items-center justify-center text-2xl z-5;
+    @apply absolute inset-0 flex items-center justify-center text-2xl z-10;
   }
-  
+
   .ladder-visual {
-    @apply absolute inset-0 flex items-center justify-center text-2xl z-5;
+    @apply absolute inset-0 flex items-center justify-center text-2xl z-10;
   }
-  
+
   .destination-info {
     @apply absolute bottom-0 right-0 bg-white/90 text-xs font-bold px-1 py-0.5 rounded-tl-md;
   }
@@ -63,26 +63,46 @@
   .text-shadow {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
+
   .animate-roll {
     animation: roll 0.6s ease-in-out;
   }
-  
+
   .animate-bounce-gentle {
     animation: bounce-gentle 2s infinite;
   }
 }
 
 @keyframes roll {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(90deg) scale(1.1); }
-  50% { transform: rotate(180deg) scale(1.2); }
-  75% { transform: rotate(270deg) scale(1.1); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: rotate(90deg) scale(1.1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+
+  75% {
+    transform: rotate(270deg) scale(1.1);
+  }
 }
 
 @keyframes bounce-gentle {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* Custom scrollbar */
@@ -107,11 +127,11 @@
   .game-board {
     @apply gap-0.5 p-2;
   }
-  
+
   .board-square {
     @apply text-xs;
   }
-  
+
   .player-piece {
     @apply w-4 h-4;
   }
