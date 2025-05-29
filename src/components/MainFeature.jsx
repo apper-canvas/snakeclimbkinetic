@@ -100,6 +100,8 @@ const MainFeature = () => {
       return
     }
 
+// Get square info for the new position (needed for delay calculation)
+    const squareInfo = getSquareInfo(newPosition)
     // If overshooting 100, stay at current position
     if (player.position + steps > WINNING_POSITION) {
       newPosition = player.position
@@ -108,7 +110,6 @@ const MainFeature = () => {
       player.position = newPosition
       
       // Check for snakes or ladders
-      const squareInfo = getSquareInfo(newPosition)
       if (squareInfo.type === 'snake') {
         setTimeout(() => {
           player.position = squareInfo.destination
