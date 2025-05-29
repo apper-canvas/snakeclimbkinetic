@@ -73,44 +73,6 @@ const MainFeature = () => {
     }
   }
 
-  // Generate path elements for snakes and ladders
-  const generatePathElements = () => {
-    const elements = []
-    
-    // Add snake paths
-    Object.entries(snakes).forEach(([start, end]) => {
-      const startCoords = getGridCoordinates(parseInt(start))
-      const endCoords = getGridCoordinates(parseInt(end))
-      
-      elements.push({
-        type: 'snake',
-        start: parseInt(start),
-        end: parseInt(end),
-        startCoords,
-        endCoords,
-        id: `snake-${start}-${end}`
-      })
-    })
-    
-    // Add ladder paths
-    Object.entries(ladders).forEach(([start, end]) => {
-      const startCoords = getGridCoordinates(parseInt(start))
-      const endCoords = getGridCoordinates(parseInt(end))
-      
-      elements.push({
-        type: 'ladder',
-        start: parseInt(start),
-        end: parseInt(end),
-        startCoords,
-        endCoords,
-        id: `ladder-${start}-${end}`
-      })
-    })
-    
-    return elements
-  }
-
-  const pathElements = generatePathElements()
 
   // Roll dice function
   const rollDice = () => {
@@ -336,67 +298,6 @@ const MainFeature = () => {
               ))}
             </div>
 
-{/* Path overlays for snakes and ladders */}
-              <div className="absolute inset-0 pointer-events-none">
-                {pathElements.map((path) => {
-                  const startX = (path.startCoords.col * 10) + 5
-                  const startY = (path.startCoords.row * 10) + 5
-                  const endX = (path.endCoords.col * 10) + 5
-                  const endY = (path.endCoords.row * 10) + 5
-                  
-                  return (
-                    <svg
-                      key={path.id}
-                      className="absolute inset-0 w-full h-full"
-                      viewBox="0 0 100 100"
-                      preserveAspectRatio="none"
-                    >
-                      {path.type === 'snake' ? (
-                        <path
-                          d={`M ${startX} ${startY} Q ${(startX + endX) / 2 + 10} ${(startY + endY) / 2 - 5} ${endX} ${endY}`}
-                          stroke="rgba(239, 68, 68, 0.6)"
-                          strokeWidth="1.5"
-                          fill="none"
-                          strokeDasharray="3,2"
-                          className="animate-pulse"
-                        />
-                      ) : (
-                        <g>
-                          <line
-                            x1={startX}
-                            y1={startY}
-                            x2={endX}
-                            y2={endY}
-                            stroke="rgba(34, 197, 94, 0.6)"
-                            strokeWidth="2"
-                            className="animate-pulse"
-                          />
-                          {/* Ladder rungs */}
-                          {Array.from({ length: 4 }).map((_, i) => {
-                            const progress = (i + 1) / 5
-                            const rungX1 = startX + (endX - startX) * progress - 2
-                            const rungY1 = startY + (endY - startY) * progress
-                            const rungX2 = startX + (endX - startX) * progress + 2
-                            const rungY2 = startY + (endY - startY) * progress
-                            
-                            return (
-                              <line
-                                key={i}
-                                x1={rungX1}
-                                y1={rungY1}
-                                x2={rungX2}
-                                y2={rungY2}
-                                stroke="rgba(34, 197, 94, 0.4)"
-                                strokeWidth="1"
-                              />
-                            )
-                          })}
-                        </g>
-                      )}
-                    </svg>
-                  )
-                })}
-              </div>
             {/* Game Board */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
