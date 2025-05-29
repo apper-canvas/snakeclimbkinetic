@@ -318,18 +318,29 @@ const MainFeature = () => {
                     }`}>
                       {position}
                     </span>
-                    
-                    {/* Special square indicators */}
+{/* Special square indicators */}
                     {squareInfo.type === 'snake' && (
                       <>
                         <div className="snake-path"></div>
-                        <ApperIcon name="ArrowDown" className="absolute top-1 right-1 w-3 h-3 text-red-600" />
+                        <div className="snake-visual">
+                          <span className="text-lg">🐍</span>
+                        </div>
+                        <div className="destination-info text-red-700">
+                          →{squareInfo.destination}
+                        </div>
+                        <ApperIcon name="ArrowDown" className="absolute top-1 left-1 w-3 h-3 text-red-600" />
                       </>
                     )}
                     {squareInfo.type === 'ladder' && (
                       <>
                         <div className="ladder-path"></div>
-                        <ApperIcon name="ArrowUp" className="absolute top-1 right-1 w-3 h-3 text-green-600" />
+                        <div className="ladder-visual">
+                          <span className="text-lg">🪜</span>
+                        </div>
+                        <div className="destination-info text-green-700">
+                          →{squareInfo.destination}
+                        </div>
+                        <ApperIcon name="ArrowUp" className="absolute top-1 left-1 w-3 h-3 text-green-600" />
                       </>
                     )}
                     {position === 100 && (
