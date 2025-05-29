@@ -72,6 +72,77 @@ const MainFeature = () => {
       return { row: 9 - row, col }
     }
   }
+// Convert grid coordinates to SVG coordinates (percentage-based)
+  const gridToSVG = (position) => {
+    const coords = getGridCoordinates(position)
+    const x = (coords.col * 10) + 5 // Center of the square (5% offset)
+    const y = (coords.row * 10) + 5 // Center of the square (5% offset)
+    return { x, y }
+  }
+
+  // Generate SVG path for snake (curved)
+  const generateSnakePath = (start, end) => {
+    const startCoords = gridToSVG(start)
+    const endCoords = gridToSVG(end)
+    
+    // Calculate control points for a curved path
+    const midX = (startCoords.x + endCoords.x) / 2
+    const midY = (startCoords.y + endCoords.y) / 2
+    const offset = 15 // Curve intensity
+    
+    return `M ${startCoords.x} ${startCoords.y} Q ${midX + offset} ${midY - offset} ${endCoords.x} ${endCoords.y}`
+  }
+
+  // Generate SVG path for ladder (stepped)
+  const generateLadderPath = (start, end) => {
+    const startCoords = gridToSVG(start)
+    const endCoords = gridToSVG(end)
+    
+    // Create a stepped ladder path
+    const steps = Math.abs(end - start) > 20 ? 4 : 3
+    let path = `M ${startCoords.x} ${startCoords.y}`
+    
+    for (let i = 1; i <= steps; i++) {
+      const progress = i / steps
+      const x = startCoords.x + (endCoords.x - startCoords.x) * progress
+      const y = startCoords.y + (endCoords.y - startCoords.y) * progress
+      const stepOffset = (i % 2 === 0) ? 2 : -2
+      path += ` L ${x + stepOffset} ${y}`
+    }
+    
+    return path
+  }
+
+  // Render path overlays
+  const renderPathOverlays = () => {
+    const paths = []
+    
+    // Add snake paths
+    Object.entries(snakes).forEach(([start, end]) => {
+      const path = generateSnakePath(parseInt(start), parseInt(end))
+      paths.push(
+        <path
+          key={`snake-${start}-${end}`}
+          d={path}
+          className="snake-svg-path"
+        />
+      )
+    })
+    
+    // Add ladder paths
+    Object.entries(ladders).forEach(([start, end]) => {
+      const path = generateLadderPath(parseInt(start), parseInt(end))
+      paths.push(
+        <path
+          key={`ladder-${start}-${end}`}
+          d={path}
+          className="ladder-svg-path"
+        />
+      )
+    })
+    
+    return paths
+  }
 
 
   // Roll dice function
@@ -298,12 +369,24 @@ const MainFeature = () => {
               ))}
             </div>
 
-            {/* Game Board */}
+{/* Game Board */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
-              className="game-board max-w-2xl mx-auto"
+              className="game-board-container"
+            >
+              {/* SVG Path Overlay */}
+              <svg 
+                className="path-overlay" 
+                viewBox="0 0 100 100" 
+                preserveAspectRatio="none"
+              >
+                {renderPathOverlays()}
+              </svg>
+              
+              {/* Game Board Grid */}
+              <div className="game-board"
             >
               {boardPositions.map((position, index) => {
                 const squareInfo = getSquareInfo(position)
@@ -380,6 +463,7 @@ const MainFeature = () => {
                   </motion.div>
                 )
               })}
+</div>
             </motion.div>
 
             {/* Game Instructions */}

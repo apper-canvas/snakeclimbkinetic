@@ -58,6 +58,31 @@
     @apply absolute bottom-0 right-0 bg-white/90 text-xs font-bold px-1 py-0.5 rounded-tl-md;
   }
 }
+.game-board-container {
+    @apply relative max-w-2xl mx-auto;
+  }
+
+  .path-overlay {
+    @apply absolute inset-0 pointer-events-none z-20;
+  }
+
+  .snake-svg-path {
+    fill: none;
+    stroke: #dc2626;
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.8;
+    filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
+  }
+
+  .ladder-svg-path {
+    fill: none;
+    stroke: #16a34a;
+    stroke-width: 3;
+    stroke-linecap: round;
+    opacity: 0.8;
+    filter: drop-shadow(0 2px 4px rgba(22, 163, 74, 0.3));
+  }
 
 @layer utilities {
   .text-shadow {
