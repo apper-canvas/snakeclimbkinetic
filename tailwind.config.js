@@ -45,7 +45,16 @@ export default {
         'xl': '0.75rem',
         '2xl': '1rem'
       }
+},
+      zIndex: {
+        '5': '5',
+        '15': '15',
+        '25': '25',
+        '35': '35',
+        '45': '45'
+      }
     }
+  },
   },
   plugins: [],
   darkMode: 'class',
