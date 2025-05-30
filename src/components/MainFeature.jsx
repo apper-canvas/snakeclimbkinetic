@@ -73,75 +73,99 @@ const MainFeature = () => {
     }
   }
 // Convert grid coordinates to SVG coordinates (percentage-based)
+// Convert grid coordinates to SVG coordinates (percentage-based)
   const gridToSVG = (position) => {
     const coords = getGridCoordinates(position)
-    const x = (coords.col * 10) + 5 // Center of the square (5% offset)
-    const y = (coords.row * 10) + 5 // Center of the square (5% offset)
+    // Scale coordinates to fit the 100x100 SVG viewBox properly
+    const x = (coords.col * 10) + 5 // Center of each 10% wide square
+    const y = (coords.row * 10) + 5 // Center of each 10% tall square
     return { x, y }
   }
 
   // Generate SVG path for snake (curved)
 // Generate modern snake design
+// Generate modern snake design with enhanced visibility
   const generateSnakeDesign = (start, end, snakeId) => {
     const startCoords = gridToSVG(start)
     const endCoords = gridToSVG(end)
     
     // Calculate snake body path with curves
     const distance = Math.sqrt(Math.pow(endCoords.x - startCoords.x, 2) + Math.pow(endCoords.y - startCoords.y, 2))
-    const segments = Math.max(3, Math.floor(distance / 15))
+    const segments = Math.max(4, Math.floor(distance / 12))
     
     let bodyPath = `M ${startCoords.x} ${startCoords.y}`
     const deltaX = (endCoords.x - startCoords.x) / segments
     const deltaY = (endCoords.y - startCoords.y) / segments
     
-    // Create curved snake body
+    // Create curved snake body with more pronounced curves
     for (let i = 1; i <= segments; i++) {
       const progress = i / segments
       const x = startCoords.x + deltaX * i
       const y = startCoords.y + deltaY * i
-      const curvature = Math.sin(progress * Math.PI * 2) * 3
+      const curvature = Math.sin(progress * Math.PI * 3) * 4 // Increased curvature
       const controlX = x + curvature
-      const controlY = y + curvature
+      const controlY = y + curvature * 0.7
       
-      bodyPath += ` Q ${controlX} ${controlY} ${x} ${y}`
+      if (i === 1) {
+        bodyPath += ` Q ${controlX} ${controlY} ${x} ${y}`
+      } else {
+        bodyPath += ` Q ${controlX} ${controlY} ${x} ${y}`
+      }
     }
     
     return (
-      <g key={`snake-${snakeId}`}>
-        {/* Snake shadow */}
+      <g key={`snake-${snakeId}`} className="snake-group">
+        {/* Snake outer shadow */}
         <path
           d={bodyPath}
-          stroke="rgba(0,0,0,0.2)"
-          strokeWidth="6"
+          stroke="rgba(0,0,0,0.4)"
+          strokeWidth="8"
           fill="none"
           strokeLinecap="round"
-          transform="translate(0.5, 0.5)"
+          transform="translate(1, 1)"
         />
-        {/* Snake body */}
+        {/* Snake body outline */}
+        <path
+          d={bodyPath}
+          stroke="#8B0000"
+          strokeWidth="7"
+          fill="none"
+          strokeLinecap="round"
+        />
+        {/* Snake body main */}
         <path
           d={bodyPath}
           stroke="url(#snakeGradient)"
-          strokeWidth="4"
+          strokeWidth="5"
           fill="none"
           strokeLinecap="round"
+        />
+        {/* Snake head shadow */}
+        <circle
+          cx={endCoords.x + 0.5}
+          cy={endCoords.y + 0.5}
+          r="4"
+          fill="rgba(0,0,0,0.3)"
         />
         {/* Snake head */}
         <circle
           cx={endCoords.x}
           cy={endCoords.y}
-          r="3"
+          r="4"
           fill="url(#snakeHeadGradient)"
           stroke="#8B0000"
-          strokeWidth="0.5"
+          strokeWidth="1"
         />
         {/* Snake eyes */}
-        <circle cx={endCoords.x - 1} cy={endCoords.y - 1} r="0.3" fill="#000" />
-        <circle cx={endCoords.x + 1} cy={endCoords.y - 1} r="0.3" fill="#000" />
+        <circle cx={endCoords.x - 1.5} cy={endCoords.y - 1} r="0.5" fill="#000" />
+        <circle cx={endCoords.x + 1.5} cy={endCoords.y - 1} r="0.5" fill="#000" />
+        <circle cx={endCoords.x - 1.5} cy={endCoords.y - 1} r="0.2" fill="#fff" />
+        <circle cx={endCoords.x + 1.5} cy={endCoords.y - 1} r="0.2" fill="#fff" />
         {/* Snake tongue */}
         <path
-          d={`M ${endCoords.x} ${endCoords.y + 1.5} L ${endCoords.x - 0.5} ${endCoords.y + 2.5} M ${endCoords.x} ${endCoords.y + 1.5} L ${endCoords.x + 0.5} ${endCoords.y + 2.5}`}
-          stroke="#FF0000"
-          strokeWidth="0.3"
+          d={`M ${endCoords.x} ${endCoords.y + 2} L ${endCoords.x - 1} ${endCoords.y + 3.5} M ${endCoords.x} ${endCoords.y + 2} L ${endCoords.x + 1} ${endCoords.y + 3.5}`}
+          stroke="#FF4444"
+          strokeWidth="0.5"
           strokeLinecap="round"
         />
       </g>
@@ -149,24 +173,24 @@ const MainFeature = () => {
   }
 
   // Generate modern ladder design
-  const generateLadderDesign = (start, end, ladderId) => {
+const generateLadderDesign = (start, end, ladderId) => {
     const startCoords = gridToSVG(start)
     const endCoords = gridToSVG(end)
     
-    const rungs = Math.max(3, Math.floor(Math.abs(end - start) / 10))
-    const ladderWidth = 2.5
+    const rungs = Math.max(4, Math.floor(Math.abs(end - start) / 8))
+    const ladderWidth = 3
     
     return (
-      <g key={`ladder-${ladderId}`}>
+      <g key={`ladder-${ladderId}`} className="ladder-group">
         {/* Ladder shadow */}
-        <g transform="translate(0.3, 0.3)" opacity="0.3">
+        <g transform="translate(1, 1)" opacity="0.4">
           <line
             x1={startCoords.x - ladderWidth}
             y1={startCoords.y}
             x2={endCoords.x - ladderWidth}
             y2={endCoords.y}
-            stroke="#8B4513"
-            strokeWidth="1.2"
+            stroke="#654321"
+            strokeWidth="2.5"
             strokeLinecap="round"
           />
           <line
@@ -174,11 +198,32 @@ const MainFeature = () => {
             y1={startCoords.y}
             x2={endCoords.x + ladderWidth}
             y2={endCoords.y}
-            stroke="#8B4513"
-            strokeWidth="1.2"
+            stroke="#654321"
+            strokeWidth="2.5"
             strokeLinecap="round"
           />
         </g>
+        
+        {/* Left rail outline */}
+        <line
+          x1={startCoords.x - ladderWidth}
+          y1={startCoords.y}
+          x2={endCoords.x - ladderWidth}
+          y2={endCoords.y}
+          stroke="#8B4513"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        {/* Right rail outline */}
+        <line
+          x1={startCoords.x + ladderWidth}
+          y1={startCoords.y}
+          x2={endCoords.x + ladderWidth}
+          y2={endCoords.y}
+          stroke="#8B4513"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
         
         {/* Left rail */}
         <line
@@ -187,7 +232,7 @@ const MainFeature = () => {
           x2={endCoords.x - ladderWidth}
           y2={endCoords.y}
           stroke="url(#ladderGradient)"
-          strokeWidth="1"
+          strokeWidth="1.8"
           strokeLinecap="round"
         />
         {/* Right rail */}
@@ -197,7 +242,7 @@ const MainFeature = () => {
           x2={endCoords.x + ladderWidth}
           y2={endCoords.y}
           stroke="url(#ladderGradient)"
-          strokeWidth="1"
+          strokeWidth="1.8"
           strokeLinecap="round"
         />
         
@@ -208,16 +253,38 @@ const MainFeature = () => {
           const rungY = startCoords.y + (endCoords.y - startCoords.y) * progress
           
           return (
-            <line
-              key={i}
-              x1={rungX - ladderWidth}
-              y1={rungY}
-              x2={rungX + ladderWidth}
-              y2={rungY}
-              stroke="url(#ladderRungGradient)"
-              strokeWidth="0.8"
-              strokeLinecap="round"
-            />
+            <g key={i}>
+              {/* Rung shadow */}
+              <line
+                x1={rungX - ladderWidth + 0.3}
+                y1={rungY + 0.3}
+                x2={rungX + ladderWidth + 0.3}
+                y2={rungY + 0.3}
+                stroke="rgba(0,0,0,0.3)"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+              />
+              {/* Rung outline */}
+              <line
+                x1={rungX - ladderWidth}
+                y1={rungY}
+                x2={rungX + ladderWidth}
+                y2={rungY}
+                stroke="#8B4513"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+              />
+              {/* Rung */}
+              <line
+                x1={rungX - ladderWidth}
+                y1={rungY}
+                x2={rungX + ladderWidth}
+                y2={rungY}
+                stroke="url(#ladderRungGradient)"
+                strokeWidth="1"
+                strokeLinecap="round"
+              />
+            </g>
           )
         })}
       </g>
@@ -228,43 +295,74 @@ const MainFeature = () => {
 const renderPathOverlays = () => {
     const elements = []
     
-    // Add gradient definitions
+    // Add enhanced gradient definitions
     elements.push(
       <defs key="gradients">
-        {/* Snake gradients */}
+        {/* Enhanced Snake gradients */}
         <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#DC2626" />
-          <stop offset="50%" stopColor="#EF4444" />
-          <stop offset="100%" stopColor="#B91C1C" />
-        </linearGradient>
-        <radialGradient id="snakeHeadGradient">
-          <stop offset="0%" stopColor="#F87171" />
+          <stop offset="30%" stopColor="#EF4444" />
           <stop offset="70%" stopColor="#DC2626" />
           <stop offset="100%" stopColor="#991B1B" />
+        </linearGradient>
+        <radialGradient id="snakeHeadGradient" cx="50%" cy="30%">
+          <stop offset="0%" stopColor="#FCA5A5" />
+          <stop offset="40%" stopColor="#EF4444" />
+          <stop offset="80%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#7F1D1D" />
         </radialGradient>
         
-        {/* Ladder gradients */}
+        {/* Enhanced Ladder gradients */}
         <linearGradient id="ladderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#D97706" />
-          <stop offset="50%" stopColor="#B45309" />
-          <stop offset="100%" stopColor="#92400E" />
+          <stop offset="0%" stopColor="#F59E0B" />
+          <stop offset="30%" stopColor="#D97706" />
+          <stop offset="70%" stopColor="#B45309" />
+          <stop offset="100%" stopColor="#78350F" />
         </linearGradient>
         <linearGradient id="ladderRungGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#F59E0B" />
-          <stop offset="50%" stopColor="#D97706" />
-          <stop offset="100%" stopColor="#B45309" />
+          <stop offset="0%" stopColor="#FCD34D" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
         </linearGradient>
+        
+        {/* Glow effects */}
+        <filter id="snakeGlow">
+          <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+          <feMerge> 
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="ladderGlow">
+          <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+          <feMerge> 
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
     )
     
-    // Add modern snake designs
+    // Add enhanced snake designs with glow effects
     Object.entries(snakes).forEach(([start, end], index) => {
-      elements.push(generateSnakeDesign(parseInt(start), parseInt(end), `${start}-${end}`))
+      const snakeElement = generateSnakeDesign(parseInt(start), parseInt(end), `${start}-${end}`)
+      // Add glow filter to snake group
+      elements.push(
+        <g key={`snake-glow-${start}-${end}`} filter="url(#snakeGlow)">
+          {snakeElement}
+        </g>
+      )
     })
     
-    // Add modern ladder designs
+    // Add enhanced ladder designs with glow effects
     Object.entries(ladders).forEach(([start, end], index) => {
-      elements.push(generateLadderDesign(parseInt(start), parseInt(end), `${start}-${end}`))
+      const ladderElement = generateLadderDesign(parseInt(start), parseInt(end), `${start}-${end}`)
+      // Add glow filter to ladder group
+      elements.push(
+        <g key={`ladder-glow-${start}-${end}`} filter="url(#ladderGlow)">
+          {ladderElement}
+        </g>
+      )
     })
     
     return elements
