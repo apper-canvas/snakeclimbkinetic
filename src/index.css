@@ -83,6 +83,18 @@
     opacity: 0.8;
     filter: drop-shadow(0 2px 4px rgba(22, 163, 74, 0.3));
   }
+/* Enhanced SVG path styles for modern designs */
+  .path-overlay svg {
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15));
+  }
+
+  .path-overlay g {
+    transition: opacity 0.3s ease;
+  }
+
+  .path-overlay g:hover {
+    opacity: 1;
+  }
 
 @layer utilities {
   .text-shadow {

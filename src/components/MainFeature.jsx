@@ -81,67 +81,193 @@ const MainFeature = () => {
   }
 
   // Generate SVG path for snake (curved)
-  const generateSnakePath = (start, end) => {
+// Generate modern snake design
+  const generateSnakeDesign = (start, end, snakeId) => {
     const startCoords = gridToSVG(start)
     const endCoords = gridToSVG(end)
     
-    // Calculate control points for a curved path
-    const midX = (startCoords.x + endCoords.x) / 2
-    const midY = (startCoords.y + endCoords.y) / 2
-    const offset = 15 // Curve intensity
+    // Calculate snake body path with curves
+    const distance = Math.sqrt(Math.pow(endCoords.x - startCoords.x, 2) + Math.pow(endCoords.y - startCoords.y, 2))
+    const segments = Math.max(3, Math.floor(distance / 15))
     
-    return `M ${startCoords.x} ${startCoords.y} Q ${midX + offset} ${midY - offset} ${endCoords.x} ${endCoords.y}`
-  }
-
-  // Generate SVG path for ladder (stepped)
-  const generateLadderPath = (start, end) => {
-    const startCoords = gridToSVG(start)
-    const endCoords = gridToSVG(end)
+    let bodyPath = `M ${startCoords.x} ${startCoords.y}`
+    const deltaX = (endCoords.x - startCoords.x) / segments
+    const deltaY = (endCoords.y - startCoords.y) / segments
     
-    // Create a stepped ladder path
-    const steps = Math.abs(end - start) > 20 ? 4 : 3
-    let path = `M ${startCoords.x} ${startCoords.y}`
-    
-    for (let i = 1; i <= steps; i++) {
-      const progress = i / steps
-      const x = startCoords.x + (endCoords.x - startCoords.x) * progress
-      const y = startCoords.y + (endCoords.y - startCoords.y) * progress
-      const stepOffset = (i % 2 === 0) ? 2 : -2
-      path += ` L ${x + stepOffset} ${y}`
+    // Create curved snake body
+    for (let i = 1; i <= segments; i++) {
+      const progress = i / segments
+      const x = startCoords.x + deltaX * i
+      const y = startCoords.y + deltaY * i
+      const curvature = Math.sin(progress * Math.PI * 2) * 3
+      const controlX = x + curvature
+      const controlY = y + curvature
+      
+      bodyPath += ` Q ${controlX} ${controlY} ${x} ${y}`
     }
     
-    return path
+    return (
+      <g key={`snake-${snakeId}`}>
+        {/* Snake shadow */}
+        <path
+          d={bodyPath}
+          stroke="rgba(0,0,0,0.2)"
+          strokeWidth="6"
+          fill="none"
+          strokeLinecap="round"
+          transform="translate(0.5, 0.5)"
+        />
+        {/* Snake body */}
+        <path
+          d={bodyPath}
+          stroke="url(#snakeGradient)"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+        />
+        {/* Snake head */}
+        <circle
+          cx={endCoords.x}
+          cy={endCoords.y}
+          r="3"
+          fill="url(#snakeHeadGradient)"
+          stroke="#8B0000"
+          strokeWidth="0.5"
+        />
+        {/* Snake eyes */}
+        <circle cx={endCoords.x - 1} cy={endCoords.y - 1} r="0.3" fill="#000" />
+        <circle cx={endCoords.x + 1} cy={endCoords.y - 1} r="0.3" fill="#000" />
+        {/* Snake tongue */}
+        <path
+          d={`M ${endCoords.x} ${endCoords.y + 1.5} L ${endCoords.x - 0.5} ${endCoords.y + 2.5} M ${endCoords.x} ${endCoords.y + 1.5} L ${endCoords.x + 0.5} ${endCoords.y + 2.5}`}
+          stroke="#FF0000"
+          strokeWidth="0.3"
+          strokeLinecap="round"
+        />
+      </g>
+    )
+  }
+
+  // Generate modern ladder design
+  const generateLadderDesign = (start, end, ladderId) => {
+    const startCoords = gridToSVG(start)
+    const endCoords = gridToSVG(end)
+    
+    const rungs = Math.max(3, Math.floor(Math.abs(end - start) / 10))
+    const ladderWidth = 2.5
+    
+    return (
+      <g key={`ladder-${ladderId}`}>
+        {/* Ladder shadow */}
+        <g transform="translate(0.3, 0.3)" opacity="0.3">
+          <line
+            x1={startCoords.x - ladderWidth}
+            y1={startCoords.y}
+            x2={endCoords.x - ladderWidth}
+            y2={endCoords.y}
+            stroke="#8B4513"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+          />
+          <line
+            x1={startCoords.x + ladderWidth}
+            y1={startCoords.y}
+            x2={endCoords.x + ladderWidth}
+            y2={endCoords.y}
+            stroke="#8B4513"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+          />
+        </g>
+        
+        {/* Left rail */}
+        <line
+          x1={startCoords.x - ladderWidth}
+          y1={startCoords.y}
+          x2={endCoords.x - ladderWidth}
+          y2={endCoords.y}
+          stroke="url(#ladderGradient)"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
+        {/* Right rail */}
+        <line
+          x1={startCoords.x + ladderWidth}
+          y1={startCoords.y}
+          x2={endCoords.x + ladderWidth}
+          y2={endCoords.y}
+          stroke="url(#ladderGradient)"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
+        
+        {/* Rungs */}
+        {Array.from({ length: rungs }, (_, i) => {
+          const progress = (i + 1) / (rungs + 1)
+          const rungX = startCoords.x + (endCoords.x - startCoords.x) * progress
+          const rungY = startCoords.y + (endCoords.y - startCoords.y) * progress
+          
+          return (
+            <line
+              key={i}
+              x1={rungX - ladderWidth}
+              y1={rungY}
+              x2={rungX + ladderWidth}
+              y2={rungY}
+              stroke="url(#ladderRungGradient)"
+              strokeWidth="0.8"
+              strokeLinecap="round"
+            />
+          )
+        })}
+      </g>
+    )
   }
 
   // Render path overlays
-  const renderPathOverlays = () => {
-    const paths = []
+const renderPathOverlays = () => {
+    const elements = []
     
-    // Add snake paths
-    Object.entries(snakes).forEach(([start, end]) => {
-      const path = generateSnakePath(parseInt(start), parseInt(end))
-      paths.push(
-        <path
-          key={`snake-${start}-${end}`}
-          d={path}
-          className="snake-svg-path"
-        />
-      )
+    // Add gradient definitions
+    elements.push(
+      <defs key="gradients">
+        {/* Snake gradients */}
+        <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#DC2626" />
+          <stop offset="50%" stopColor="#EF4444" />
+          <stop offset="100%" stopColor="#B91C1C" />
+        </linearGradient>
+        <radialGradient id="snakeHeadGradient">
+          <stop offset="0%" stopColor="#F87171" />
+          <stop offset="70%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#991B1B" />
+        </radialGradient>
+        
+        {/* Ladder gradients */}
+        <linearGradient id="ladderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#D97706" />
+          <stop offset="50%" stopColor="#B45309" />
+          <stop offset="100%" stopColor="#92400E" />
+        </linearGradient>
+        <linearGradient id="ladderRungGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#F59E0B" />
+          <stop offset="50%" stopColor="#D97706" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+    )
+    
+    // Add modern snake designs
+    Object.entries(snakes).forEach(([start, end], index) => {
+      elements.push(generateSnakeDesign(parseInt(start), parseInt(end), `${start}-${end}`))
     })
     
-    // Add ladder paths
-    Object.entries(ladders).forEach(([start, end]) => {
-      const path = generateLadderPath(parseInt(start), parseInt(end))
-      paths.push(
-        <path
-          key={`ladder-${start}-${end}`}
-          d={path}
-          className="ladder-svg-path"
-        />
-      )
+    // Add modern ladder designs
+    Object.entries(ladders).forEach(([start, end], index) => {
+      elements.push(generateLadderDesign(parseInt(start), parseInt(end), `${start}-${end}`))
     })
     
-    return paths
+    return elements
   }
 
 
