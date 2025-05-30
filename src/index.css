@@ -62,8 +62,8 @@
     @apply relative max-w-2xl mx-auto;
   }
 
-  .path-overlay {
-    @apply absolute inset-0 pointer-events-none z-20;
+.path-overlay {
+    @apply absolute inset-0 pointer-events-none z-5;
   }
 
   .snake-svg-path {
@@ -188,6 +188,15 @@ stroke-width: 2;
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-surface-400;
+}
+/* Board square number visibility enhancement */
+.board-square > span {
+  position: relative;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 4px;
+  border-radius: 4px;
+  backdrop-filter: blur(2px);
 }
 
 /* Responsive game board adjustments */
